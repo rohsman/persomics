@@ -1,0 +1,1 @@
+var fileHandlerApp = angular.module('fileHandlerApp', ['ngFileUpload']);

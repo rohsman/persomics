@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="persomics.css">
+    </head>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script> 
+    <script type="text/javascript" src="ng-file-upload/dist/ng-file-upload.min.js"></script>
+    <script type="text/javascript" src="ng-file-upload/dist/ng-file-upload-shim.min.js"></script>
+    <body>
+
+        <h1 class="logo"></h1>
+        <div ng-app="fileHandlerApp" id="main">
+            <h2>F<span class="highlight">o</span>lder - test plate image analyzer</h2>         
+
+            <div ng-controller="fileUpploadCtrl">
+                <h3>Upl<span class="highlight">o</span>ad file</h3>
+
+                <form class="upload-form" name="uploadForm"x>
+                    <table>
+                        <tr>
+                            <td>Image file:</td>
+                            <td><input type="file" name="imageFile" ngf-select name="imageFile" ng-model="imageFile" accept="image/tiff" required ng-disabled="uploadStatus.status === 'ongoing'"/></td>
+                        </tr>
+                        <tr>
+                            <td>Annotation file:</td>
+                            <td><input type="file" name="annotationFile" ngf-select ng-model="annotationFile" accept="text/csv" required ng-disabled="uploadStatus.status === 'ongoing'"/></td>
+                        </tr>
+                        <tr>
+                            <td>Email address:</td>
+                            <td><input type="email" name="email" id="email" ng-model="email" required ng-disabled="uploadStatus.status === 'ongoing'" autofillable/></td>
+                        </tr>
+                    </table>          
+                    
+                    <button class="button upload-button" ng-disabled="uploadForm.$invalid || uploadStatus.status === 'ongoing'" ng-click="uploadFile($event)">
+                        <div class="progress-bar" style="width: {{uploadStatus.progress}};" ng-class="{'progress-aborted' : uploadStatus.status === 'aborted'}"></div>
+                        Upload
+                    </button>
+
+                </form>
+
+            </div>
+
+            <div ng-controller="fileDownloadCtrl">
+                <h3>D<span class="highlight">o</span>wnl<span class="highlight">o</span>ad pr<span class="highlight">o</span>cessed files</h3>
+
+                <p class="note" ng-if="downloadStatus.text">
+                    <span class="indicator" ng-if="downloadStatus.isProcessing"></span>
+                    {{downloadStatus.text}}
+                </p>
+
+                <a class="button download-button" ng-if="files.length > 0" href="{{downloadAllFilesZipUrl}}" download>Download all as zip file</a>
+
+                <ul class="fileList" ng-if="files.length > 0">
+                    <li ng-repeat="file in files">
+                        <a href="{{downloadUrl}}{{file}}" download>{{file}}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <script src="FileHandlerApp.js"></script>
+        <script src="FileUpploadController.js"></script>
+        <script src="FileDownloadController.js"></script>
+        <script src="AutofillableDirective.js"></script>
+    </body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "FileHandler",
+  "version": "1.0.1",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Karin Röhsman",
+  "license": "ISC",
+  "private": true,
+  "dependencies": {
+    "body-parser": "1.14.1",
+    "express": "4.13.3",
+    "fs": "0.0.2",
+    "multer": "1.1.0",
+    "zerorpc": "0.9.6",
+    "nodemailer": "2.4.2",
+    "rmdir": "1.2.0",
+    "zip-folder": "1.0.0"
+  }
+}
