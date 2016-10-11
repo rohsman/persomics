@@ -34,6 +34,8 @@
   *
   **/
 
+    require('console-stamp')(console);
+
     var LONG_TIMEOUT_MS = 1000*60*60*3;
 
     var config = require('./config'); 
@@ -58,7 +60,7 @@
     });
 
     // Serving from the same express Server. No cors required.
-    app.use(express.static('public'));
+    app.use(express.static('/home/karin/server/public'));
     app.use(express.static(config.directories.download));
     app.use(express.static(config.directories.zip));
     app.use(bodyParser.json());  
@@ -68,7 +70,7 @@
 
     var storage = multer.diskStorage({ //multers disk storage settings
         destination: function (req, file, cb) {
-            var transferDirectory = './' + config.directories.upload + '/' + req.body.transferId;
+            var transferDirectory = config.directories.upload + '/' + req.body.transferId;
             if (!fs.existsSync(transferDirectory)) {
                 fs.mkdirSync(transferDirectory);
             }
@@ -87,8 +89,7 @@
     var upload = multer({ //multer settings
                     storage: storage
                 }).fields([
-                    { name: 'imageFile', maxCount: 1 }, 
-                    { name: 'annotationFile', maxCount: 1 }
+                    { name: 'imageFile', maxCount: 1 }
                 ]);
 
     var pythonClient = new zerorpc.Client({ timeout: config.python.timeout, heartbeatInterval: LONG_TIMEOUT_MS });
@@ -108,7 +109,7 @@
             console.log('Upload complete');
             res.json({error_code:0,err_desc:null});
 
-            processImage(req.files['imageFile'][0].filename, req.body.email, req.body.transferId);
+            processImage(req.files['imageFile'][0].filename, req.body.annotationFile, req.body.email, req.body.transferId);
         });
     });
 
@@ -172,10 +173,10 @@
         return files.filter(item => !(/(^|\/)\.[^\/\.]/g).test(item));
     }
 
-    function processImage(imageFileName, email, transferId) {
-        console.log('Analysing ' + imageFileName + ' for ' + email);
+    function processImage(imageFileName, annotationFileName, email, transferId) {
+        console.log('Analysing ' + imageFileName + ' with annotation file ' + annotationFileName + ' for ' + email);
 
-        pythonClient.invoke('detect_spots', transferId, function(err, res, more) {
+        pythonClient.invoke('detect_spots', transferId, annotationFileName, function(err, res, more) {
             console.log('Analysis complete');
 
             var msg = { 

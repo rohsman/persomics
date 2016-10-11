@@ -23,7 +23,9 @@
                         </tr>
                         <tr>
                             <td>Annotation file:</td>
-                            <td><input type="file" name="annotationFile" ngf-select ng-model="annotationFile" accept="text/csv" required ng-disabled="uploadStatus.status === 'ongoing'"/></td>
+                            <td><select name="annotationFile" ng-model="annotationFile" required ng-disabled="uploadStatus.status === 'ongoing'">
+                                <option value="annotation_Set_1.csv">annotation_Set_1.csv</option>
+                            </select></td>
                         </tr>
                         <tr>
                             <td>Email address:</td>

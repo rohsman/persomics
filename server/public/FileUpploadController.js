@@ -6,7 +6,7 @@ fileHandlerApp.controller('fileUpploadCtrl', ['$rootScope', '$scope', 'Upload', 
 
     $scope.uploadFile = function(event) {
         $scope.uploadStatus.status = 'ongoing';
-
+        
         Upload.upload({
             url: '/upload', 
             data: {
