@@ -60,7 +60,7 @@
     });
 
     // Serving from the same express Server. No cors required.
-    app.use(express.static('/home/karin/server/public'));
+    app.use(express.static(config.directories.public));
     app.use(express.static(config.directories.download));
     app.use(express.static(config.directories.zip));
     app.use(bodyParser.json());  
@@ -176,7 +176,7 @@
     function processImage(imageFileName, annotationFileName, email, transferId) {
         console.log('Analysing ' + imageFileName + ' with annotation file ' + annotationFileName + ' for ' + email);
 
-        pythonClient.invoke('detect_spots', transferId, annotationFileName, function(err, res, more) {
+        pythonClient.invoke('RPC_annotation_from_reference_step_3', transferId, annotationFileName, function(err, res, more) {
             console.log('Analysis complete');
 
             var msg = { 
@@ -197,7 +197,7 @@
             notifyClients(msg);
 
             if (config.email) {
-                sendEmail(email, createEmailHtmlText(msg));                
+                sendEmail(email, createEmailSubject(msg), createEmailHtmlText(msg));                
             }
 
             // Remove temporary files
@@ -217,18 +217,28 @@
         });
     }
 
+    function createEmailSubject(msg) {
+        var subject;
+        if (msg.error) {
+            subject = 'Persomics file processing error';
+        } else {
+            subject = 'Persomics file processed';
+        }
+        return subject;
+    }
+
     function createEmailHtmlText(msg) {
         var htmlText;
         if (msg.error) {
             htmlText = '<p>Your file <i>' + msg.image + '</i> could not be processed.</p><p>' + msg.error + '</p>';
         } else {
-            var downloadUrl = 'http://' + os.hostname() + ':' + config.server_port + '/#?id=' + msg.transferId;
+            var downloadUrl = config.server.address + '/#?id=' + msg.transferId;
             htmlText = '<p>Your file <i>' + msg.image + '</i> have been processed.</p><p>Downloads: <a href="' + downloadUrl + '">' + downloadUrl + '</a></p><ul>';
         }
         return htmlText;
     }
 
-    function sendEmail(toAddress, htmlText) {
+    function sendEmail(toAddress, subject, htmlText) {
         var transporter = nodemailer.createTransport({
             host: config.email.host,
             port: config.email.port,
@@ -244,7 +254,7 @@
         var mailOptions = {
             from: config.email.user, // sender address
             to: toAddress, // list of receivers
-            subject: 'Persomics file processed', // Subject line
+            subject: subject, // Subject line
             //text: '', // use plaintext body...
             html: htmlText // ...or HTML body instead
         };
@@ -286,8 +296,8 @@
         });
     });
 
-    var server = app.listen(config.server_port, function() {
-        console.log('Running on port ' + config.server_port);
+    var server = app.listen(config.server.port, function() {
+        console.log('Running on port ' + config.server.port);
         console.log('Hostname: ' + os.hostname());
     });
     server.timeout = LONG_TIMEOUT_MS;
