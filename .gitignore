@@ -1,0 +1,4 @@
+# Local file system
+.DS_Store
+# Private keys
+*.pem
