@@ -84,6 +84,9 @@ h3 {
     width: 100%;
     margin-left: -0.5em;
 }
+.upload-form select {
+    margin-left: -0.5em;
+}
 
 .upload-button {
     margin: 1.5em 0 0.5em 0;
